@@ -1,0 +1,3 @@
+#! /usr/bin/env bash
+
+npm run build && surge dist/ my-app.surge.sh

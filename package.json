@@ -2,7 +2,7 @@
   "name": "cesium-satellites",
   "version": "1.0.0",
   "description": "View the orbit of satellites in a Cesium viewer, derived from a two line element list",
-  "main": "index.js",
+  "main": "server.js",
   "keywords": [
     "cesium",
     "webpack",
@@ -15,25 +15,30 @@
     "url": "http://www.kldsrf.com/"
   },
   "license": "Apache-2.0",
-  "devDependencies": {
-    "cesium": "^1.39.0",
-    "copy-webpack-plugin": "^4.0.1",
-    "css-loader": "^0.28.7",
-    "html-webpack-plugin": "^2.30.1",
-    "strip-pragma-loader": "^1.0.0",
-    "style-loader": "^0.18.2",
-    "uglifyjs-webpack-plugin": "^1.0.0-beta.3",
-    "url-loader": "^0.6.2",
-    "webpack": "^3.5.6",
-    "webpack-dev-server": "^2.9.1"
-  },
   "scripts": {
-    "build": "node_modules/.bin/webpack --config webpack.config.js"
+    "build": "webpack --config webpack.config.js",
+    "dev": "node .",
+    "deploy": "./deploy.sh"
   },
   "dependencies": {
     "ajv": "^6.1.1",
     "crel": "^3.1.0",
     "moment": "^2.20.1",
     "tle.js": "^1.0.21"
+  },
+  "devDependencies": {
+    "cesium": "^1.39.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "cors": "^2.8.4",
+    "css-loader": "^0.28.7",
+    "express": "^4.16.3",
+    "html-webpack-plugin": "^2.30.1",
+    "strip-pragma-loader": "^1.0.0",
+    "style-loader": "^0.18.2",
+    "surge": "^0.20.1",
+    "uglifyjs-webpack-plugin": "^1.0.0-beta.3",
+    "url-loader": "^0.6.2",
+    "webpack": "^3.5.6",
+    "webpack-dev-server": "^2.9.1"
   }
 }

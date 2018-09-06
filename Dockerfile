@@ -7,7 +7,8 @@ ADD  src /frontend/src/
 COPY package.json /frontend 
 COPY webpack.config.js /frontend
 RUN  cd /frontend && npm install && npm run build
-RUN  cp -r /frontend/dist/* /usr/share/nginx/html
+RUN  rm -rf /usr/share/nginx/html
+RUN  ln -s /frontend/dist/ /usr/share/nginx/html
 ENTRYPOINT \
-     wget -P /usr/share/nginx/html http://celestrak.com/NORAD/elements/stations.txt \
-     && nginx -g "daemon off;"
+    wget -P /usr/share/nginx/html http://celestrak.com/NORAD/elements/stations.txt \
+    && nginx -g "daemon off;"
