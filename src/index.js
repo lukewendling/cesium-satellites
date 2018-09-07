@@ -47,7 +47,7 @@ function fetchData() {
     },
     body: JSON.stringify({
       query:
-        "query getSpacecraft($spacecraftId: String!) {spacecraft(_id: $spacecraftId) {latest_tle}}",
+        "query getSpacecraft($spacecraftId: String!) {spacecraft(id: $spacecraftId) {latest_tle}}",
       variables: { spacecraftId }
     })
   })
