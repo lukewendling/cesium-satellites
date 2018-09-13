@@ -38,6 +38,7 @@ module.exports = [
       new CopyWebpackPlugin([
         { from: path.join(cesiumSource, "Assets"), to: "dist/Assets" }
       ]),
+      new CopyWebpackPlugin([{ from: "./src/icons", to: "dist/Assets/Icons" }]),
       new CopyWebpackPlugin([
         { from: path.join(cesiumSource, "Widgets"), to: "dist/Widgets" }
       ]),

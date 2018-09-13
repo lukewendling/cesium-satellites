@@ -15,12 +15,15 @@ const cesiumWithCR = new CesiumClasses.CesiumWithCorrectedReflectance(
 );
 const cesiumViewer = cesiumWithCR.cesiumViewer;
 const orbitPointsDrawer = new AdditionalClasses.OrbitPointsDrawer(cesiumViewer);
+const groundTrackPolylineDrawer = new AdditionalClasses.GroundTrackPolylineDrawer(
+  cesiumViewer
+);
 const orbitPolylineDrawer = new AdditionalClasses.OrbitPolylineDrawer(
   cesiumViewer
 );
 
 // define a global variable to store TLEs
-var twoLineElements;
+// var twoLineElements;
 
 var authToken, graphqlEndpoint, spacecraftId;
 
@@ -29,7 +32,7 @@ $(() => window.parent.postMessage({ ready: true }, "*"));
 
 window.addEventListener("message", ({ data }) => {
   console.debug("received message in iframe", data);
-  const { token, apiEndpoint } = data;
+  var { token, apiEndpoint } = data;
   spacecraftId = data.spacecraftId;
   authToken = token;
   graphqlEndpoint = apiEndpoint;
@@ -53,9 +56,13 @@ function fetchData() {
   })
     .then(r => r.json())
     .then(({ data }) => {
-      console.debug("data fetched:", data);
-      drawOrbit(data.spacecraft.latest_tle.join("\n"));
-    });
+      console.debug("TLE received:", data);
+      draw(data.spacecraft.latest_tle);
+
+      // cesiumViewer.zoomTo(cesiumViewer.entities);
+      cesiumViewer.scene.globe.enableLighting = true;
+    })
+    .catch(console.error);
 }
 
 // main entry point of the application
@@ -71,38 +78,42 @@ function fetchData() {
  * Draws orbit points and polyline given a TLE string
  * @param {string} _twoLineElement
  */
-function drawOrbit(_twoLineElement) {
+function draw(_twoLineElement) {
   orbitPointsDrawer.twoLineElement = _twoLineElement;
+  orbitPointsDrawer.draw();
   orbitPolylineDrawer.twoLineElement = _twoLineElement;
+  orbitPolylineDrawer.draw();
+  groundTrackPolylineDrawer.twoLineElement = _twoLineElement;
+  groundTrackPolylineDrawer.draw();
 }
 
 /**
  * Adds an onClick event to a satellite button
  * @param {Element} _satelliteElement
  */
-function addOnClickSatelliteEvent(_satelliteElement) {
-  _satelliteElement.onclick = function() {
-    var tleIndex = parseInt(this.getAttribute("value"));
-    drawOrbit(twoLineElements.slice(tleIndex, tleIndex + 3).join("\n"));
-  };
-}
+// function addOnClickSatelliteEvent(_satelliteElement) {
+//   _satelliteElement.onclick = function() {
+//     var tleIndex = parseInt(this.getAttribute("value"));
+//     drawOrbit(twoLineElements.slice(tleIndex, tleIndex + 3).join("\n"));
+//   };
+// }
 
 /**
  * Creates the list of satellites from the global TLE file
  */
-function createListOfSatellites() {
-  //   const listSelector = document.getElementById("list-of-satellites");
-  //   for (var iterator = 0; iterator < twoLineElements.length; iterator += 3) {
-  //     // crel here will create an `a` element that represents a satellite button
-  //     listSelector.appendChild(
-  //       crel(
-  //         "a",
-  //         { class: "list-group-item", value: iterator.toString() },
-  //         twoLineElements[iterator] // this is the name of the satellite
-  //       )
-  //     );
-  //   }
-  //   Array.from(listSelector.children).forEach(element =>
-  //     addOnClickSatelliteEvent(element)
-  //   );
-}
+// function createListOfSatellites() {
+//   const listSelector = document.getElementById("list-of-satellites");
+//   for (var iterator = 0; iterator < twoLineElements.length; iterator += 3) {
+//     // crel here will create an `a` element that represents a satellite button
+//     listSelector.appendChild(
+//       crel(
+//         "a",
+//         { class: "list-group-item", value: iterator.toString() },
+//         twoLineElements[iterator] // this is the name of the satellite
+//       )
+//     );
+//   }
+//   Array.from(listSelector.children).forEach(element =>
+//     addOnClickSatelliteEvent(element)
+//   );
+// }

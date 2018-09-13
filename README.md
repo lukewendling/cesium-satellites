@@ -10,12 +10,13 @@
 
 ```bash
 PORT=8002 npm run dev
+npm run watch
 ```
 
 ## Run with Docker
 
 ```bash
-git clone https://github.com/KhaledSharif/cesium-satellites.git
+git clone https://github.com/lukewendling/cesium-satellites.git
 cd cesium-satellites
 docker build -t cesium:satellites .
 docker run -d -p 8080:80 cesium:satellites

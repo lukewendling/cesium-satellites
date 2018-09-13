@@ -18,13 +18,16 @@
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "dev": "node .",
-    "deploy": "./deploy.sh"
+    "deploy": "./deploy.sh",
+    "watch": "watch 'npm run build' src/"
   },
   "dependencies": {
     "ajv": "^6.1.1",
     "crel": "^3.1.0",
     "moment": "^2.20.1",
-    "tle.js": "^1.0.21"
+    "satellite.js": "^2.0.2",
+    "tle.js": "^1.0.21",
+    "watch": "^1.0.2"
   },
   "devDependencies": {
     "cesium": "^1.39.0",
