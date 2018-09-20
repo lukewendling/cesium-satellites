@@ -28,7 +28,9 @@ const orbitPolylineDrawer = new AdditionalClasses.OrbitPolylineDrawer(
 var authToken, graphqlEndpoint, spacecraftId;
 
 // tell parent window when ready to receive postMessage calls
-$(() => window.parent.postMessage({ ready: true }, "*"));
+$(() =>
+  window.parent.postMessage({ ready: true, frame_name: "sat-track" }, "*")
+);
 
 window.addEventListener("message", ({ data }) => {
   console.debug("received message in iframe", data);
