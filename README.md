@@ -9,7 +9,7 @@
 ## Run locally
 
 ```bash
-PORT=8002 npm run dev
+npm run dev
 npm run watch
 ```
 

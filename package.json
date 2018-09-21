@@ -17,7 +17,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "dev": "node .",
+    "dev": "PORT=8082 node .",
     "deploy": "./deploy.sh",
     "watch": "watch 'npm run build' src/"
   },
