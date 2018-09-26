@@ -16,7 +16,7 @@ class CesiumWithCorrectedReflectance {
       imageryProvider: imageryProvider,
       animation: false,
       baseLayerPicker: false,
-      fullscreenButton: false,
+      fullscreenButton: true,
       homeButton: false,
       infoBox: false,
       sceneModePicker: false,
