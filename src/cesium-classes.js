@@ -11,6 +11,8 @@ class CesiumWithCorrectedReflectance {
     });
     imageryProvider.defaultBrightness = 1.5;
     this.cesiumViewer = new CesiumLibrary.Viewer("cesiumContainer", {
+      scene3DOnly: true,
+      skyAtmosphere: false,
       shadows: true,
       geocoder: false,
       imageryProvider: imageryProvider,
