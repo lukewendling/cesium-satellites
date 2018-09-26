@@ -1,5 +1,5 @@
 // import crel
-const crel = require("crel");
+// const crel = require("crel");
 
 // import relevant css
 const CesiumWidgetsCss = require("cesium/Source/Widgets/widgets.css");
@@ -22,11 +22,6 @@ const orbitPolylineDrawer = new AdditionalClasses.OrbitPolylineDrawer(
   cesiumViewer
 );
 
-// define a global variable to store TLEs
-// var twoLineElements;
-
-var authToken, graphqlEndpoint, spacecraftId;
-
 // tell parent window when ready to receive postMessage calls
 $(() =>
   window.parent.postMessage({ ready: true, frame_name: "sat-track" }, "*")
@@ -34,15 +29,23 @@ $(() =>
 
 window.addEventListener("message", ({ data }) => {
   console.debug("received message in iframe", data);
-  var { token, apiEndpoint } = data;
-  spacecraftId = data.spacecraftId;
-  authToken = token;
-  graphqlEndpoint = apiEndpoint;
-  fetchData();
+  fetchData(data)
+    .then(({ data }) => {
+      console.debug("TLE received:", data);
+      draw(data.spacecraft.latest_tle);
+
+      // cesiumViewer.zoomTo(cesiumViewer.entities);
+      cesiumViewer.scene.globe.enableLighting = true;
+    })
+    .catch(console.error);
 });
 
-function fetchData() {
-  if (!spacecraftId) return console.warn("ERROR: missing spacecraftId!");
+function fetchData({
+  token: authToken,
+  apiEndpoint: graphqlEndpoint,
+  spacecraftId
+}) {
+  if (!spacecraftId) throw new Error("ERROR: missing spacecraftId!");
   return fetch(graphqlEndpoint, {
     method: "POST",
     headers: {
@@ -55,16 +58,7 @@ function fetchData() {
         "query getSpacecraft($spacecraftId: String!) {spacecraft(id: $spacecraftId) {latest_tle}}",
       variables: { spacecraftId }
     })
-  })
-    .then(r => r.json())
-    .then(({ data }) => {
-      console.debug("TLE received:", data);
-      draw(data.spacecraft.latest_tle);
-
-      // cesiumViewer.zoomTo(cesiumViewer.entities);
-      cesiumViewer.scene.globe.enableLighting = true;
-    })
-    .catch(console.error);
+  }).then(r => r.json());
 }
 
 // main entry point of the application

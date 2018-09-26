@@ -140,7 +140,7 @@ class OrbitPointsDrawer extends OrbitCommonClass {
           text: label,
           font: "10pt sans-serif",
           // style: CesiumLibrary.LabelStyle.FILL,
-          fillColor: CesiumLibrary.Color.BLACK,
+          fillColor: CesiumLibrary.Color.WHITE,
           // outlineWidth: 2,
           verticalOrigin: CesiumLibrary.VerticalOrigin.TOP,
           pixelOffset: new CesiumLibrary.Cartesian2(0, 16)
@@ -162,7 +162,7 @@ class OrbitPointsDrawer extends OrbitCommonClass {
           text: label,
           font: "10pt sans-serif",
           // style: CesiumLibrary.LabelStyle.FILL,
-          fillColor: CesiumLibrary.Color.BLACK,
+          fillColor: CesiumLibrary.Color.WHITE,
           // outlineWidth: 2,
           verticalOrigin: CesiumLibrary.VerticalOrigin.TOP,
           pixelOffset: new CesiumLibrary.Cartesian2(0, 16)
