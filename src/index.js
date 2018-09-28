@@ -30,9 +30,9 @@ $(() =>
 window.addEventListener("message", ({ data }) => {
   console.debug("received message in iframe", data);
   fetchData(data)
-    .then(({ data }) => {
+    .then(data => {
       console.debug("TLE received:", data);
-      draw(data.spacecraft.latest_tle);
+      draw(data.data.spacecraft.latest_tle);
 
       // cesiumViewer.zoomTo(cesiumViewer.entities);
       cesiumViewer.scene.globe.enableLighting = true;
@@ -54,8 +54,14 @@ function fetchData({
       Authorization: authToken
     },
     body: JSON.stringify({
-      query:
-        "query getSpacecraft($spacecraftId: String!) {spacecraft(id: $spacecraftId) {latest_tle}}",
+      query: `query getSpacecraft($spacecraftId: String!) {
+          spacecraft(id: $spacecraftId) {
+            latest_tle {
+              tle_line1
+              tle_line2
+            }
+          }
+        }`,
       variables: { spacecraftId }
     })
   }).then(r => r.json());
@@ -75,6 +81,7 @@ function fetchData({
  * @param {string} _twoLineElement
  */
 function draw(_twoLineElement) {
+  _twoLineElement = [_twoLineElement.tle_line1, _twoLineElement.tle_line2];
   orbitPointsDrawer.twoLineElement = _twoLineElement;
   orbitPointsDrawer.draw();
   orbitPolylineDrawer.twoLineElement = _twoLineElement;
