@@ -44,7 +44,7 @@ window.addEventListener("message", ({ data }) => {
         destination: CesiumLibrary.Cartesian3.fromElements(
           center.x,
           center.y,
-          zSign * 10 ** 7 // good height for LEOs
+          zSign * 0.18 * 10 ** 8 // good height for LEOs
         )
       });
       cesiumViewer.scene.globe.enableLighting = true;
