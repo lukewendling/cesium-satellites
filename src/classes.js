@@ -245,9 +245,58 @@ class GroundTrackPointsDrawer extends OrbitCommonClass {
   }
 }
 
+class GroundStationsDrawer extends OrbitCommonClass {
+  constructor(cesiumMapObject) {
+    super(cesiumMapObject);
+    this._groundStationPoints = [];
+  }
+
+  getGroundStations() {
+    return [
+      { name: "Hula A", lat: 21.56228, lng: 201.757891389, alt: 428.42 },
+      { name: "Hula B", lat: 21.568978333, lng: 201.737703056, alt: 317.7 },
+      { name: "Lion A", lat: 51.115097889, lng: 359.093909306, alt: 140.059 },
+      { name: "Lion B", lat: 51.117873806, lng: 359.093574806, alt: 138.585 },
+      { name: "Boss A", lat: 42.947833333, lng: 288.373441111, alt: 204.62 },
+      { name: "Boss B", lat: 42.944754444, lng: 288.369681389, alt: 194.6 },
+      { name: "Cook A", lat: 34.822609417, lng: 239.49814825, alt: 271.53 },
+      { name: "Cook B", lat: 34.825636194, lng: 239.494601, alt: 267.6 },
+      { name: "Guam A", lat: 13.615194444, lng: 144.855794722, alt: 216.9 },
+      { name: "Guam B", lat: 13.615880278, lng: 144.855167222, alt: 211.1 },
+      { name: "Pike", lat: 38.805935278, lng: 255.47152, alt: 1899.1 },
+      { name: "Pogo A", lat: 76.51595995, lng: 291.40002473, alt: 141.76 },
+      { name: "Pogo B", lat: 76.51536439, lng: 291.40114169, alt: 147.03 },
+      { name: "Pogo C", lat: 76.5157025, lng: 291.395008055, alt: 146.386 },
+      { name: "Reef", lat: -7.270022778, lng: 72.370023056, alt: -56.8 }
+    ];
+  }
+
+  // Draw ground station points with lat-lng coords
+  _draw() {
+    if (this._groundStationPoints.length != 0) {
+      for (var gsp of this._groundStationPoints)
+        this._cesiumMapObject.entities.remove(gsp);
+    }
+
+    this.getGroundStations().forEach(gs => {
+      var marker = {
+        name: `Air Force SCN Station ${gs.name}`,
+        position: CesiumLibrary.Cartesian3.fromDegrees(gs.lng, gs.lat),
+        billboard: {
+          image: "Assets/Icons/facility.gif"
+        }
+      };
+      this._groundStationPoints.push(
+        this._cesiumMapObject.entities.add(marker)
+      );
+    });
+  }
+}
+
 module.exports = {
   GroundTrackPointsDrawer,
   OrbitPolylineDrawer,
   GroundTrackPolylineDrawer,
-  CurrentPositionDrawer
+  CurrentPositionDrawer,
+  GroundStationsDrawer
 };

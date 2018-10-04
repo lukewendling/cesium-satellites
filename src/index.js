@@ -25,6 +25,9 @@ const orbitPolylineDrawer = new AdditionalClasses.OrbitPolylineDrawer(
 const currentPositionDrawer = new AdditionalClasses.CurrentPositionDrawer(
   cesiumViewer
 );
+const groundStationsDrawer = new AdditionalClasses.GroundStationsDrawer(
+  cesiumViewer
+);
 
 // tell parent window when ready to receive postMessage calls
 $(() =>
@@ -89,6 +92,7 @@ function draw(spacecraft) {
     groundTrackPolylineDrawer.twoLineElement = lines;
     groundTrackPolylineDrawer.draw();
   }
+  groundStationsDrawer.draw();
   groundTrackPointsDrawer.twoLineElement = lines;
   groundTrackPointsDrawer.showOnlyCurrent = isGeo;
   groundTrackPointsDrawer.draw();

@@ -20,7 +20,7 @@ class Cesium {
       baseLayerPicker: false,
       fullscreenButton: true,
       homeButton: false,
-      infoBox: false,
+      infoBox: true,
       sceneModePicker: false,
       selectionIndicator: false,
       timeline: false,
