@@ -21,7 +21,7 @@ class OrbitCommonClass {
   }
 
   draw() {
-    this._draw();
+    return this._draw();
   }
 }
 
@@ -35,26 +35,29 @@ class OrbitPolylineDrawer extends OrbitCommonClass {
   _draw() {
     var satelliteOrbit = [];
     var newTime = null;
+    // ignores line 1 in 3 line variant.
+    var [tle1, tle2] = this.twoLineElement.slice(-2);
+    var satrec = satelliteLibrary.twoline2satrec(tle1, tle2);
+    var gmst = satelliteLibrary.gstime(new Date());
 
     for (var i of [...Array(100).keys()]) {
       newTime = MomentLibrary().add(i * 10, "minutes");
-      // ignores line 1 in 3 line variant.
-      var [tle1, tle2] = this.twoLineElement.slice(-2);
-      var satrec = satelliteLibrary.twoline2satrec(tle1, tle2);
       var positionAndVelocity = satelliteLibrary.propagate(
         satrec,
         newTime.toDate()
       );
       var positionEci = positionAndVelocity.position;
-      satelliteOrbit = satelliteOrbit.concat([
-        positionEci.x * 1000,
-        positionEci.y * 1000,
-        positionEci.z * 1000
-        // 404.8 * 1000
-      ]);
+      var positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst),
+        satelliteOrbit = satelliteOrbit.concat([
+          positionEcf.x * 1000,
+          positionEcf.y * 1000,
+          positionEcf.z * 1000
+          // 404.8 * 1000
+        ]);
     }
     if (this._orbitPolyline)
       this._cesiumMapObject.entities.remove(this._orbitPolyline);
+
     this._orbitPolyline = this._cesiumMapObject.entities.add({
       name: "Orbit Polyline",
       polyline: {
@@ -66,6 +69,45 @@ class OrbitPolylineDrawer extends OrbitCommonClass {
         )
       }
     });
+  }
+}
+
+class CurrentPositionDrawer extends OrbitCommonClass {
+  constructor(cesiumMapObject) {
+    super(cesiumMapObject);
+    this._currentPos = null;
+  }
+
+  // Draw current position
+  _draw() {
+    var [tle1, tle2] = this.twoLineElement.slice(-2);
+    var satrec = satelliteLibrary.twoline2satrec(tle1, tle2);
+    var newTime = MomentLibrary();
+    var positionAndVelocity = satelliteLibrary.propagate(
+      satrec,
+      newTime.toDate()
+    );
+    var gmst = satelliteLibrary.gstime(newTime.toDate());
+    var positionEci = positionAndVelocity.position;
+    var positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst);
+    var satellitePos = CesiumLibrary.Cartesian3.fromElements(
+      positionEcf.x * 1000,
+      positionEcf.y * 1000,
+      positionEcf.z * 1000
+      // 404.8 * 1000
+    );
+
+    if (this._currentPos)
+      this._cesiumMapObject.entities.remove(this._currentPos);
+
+    this._currentPos = this._cesiumMapObject.entities.add({
+      position: satellitePos,
+      billboard: {
+        image: "Assets/Icons/sat.png"
+      }
+    });
+
+    return satellitePos;
   }
 }
 
@@ -107,10 +149,15 @@ class GroundTrackPolylineDrawer extends OrbitCommonClass {
   }
 }
 
-class OrbitPointsDrawer extends OrbitCommonClass {
+class GroundTrackPointsDrawer extends OrbitCommonClass {
   constructor(cesiumMapObject) {
     super(cesiumMapObject);
     this._orbitPoints = [];
+    this._showOnlyCurrent = false;
+  }
+
+  set showOnlyCurrent(b) {
+    this._showOnlyCurrent = b;
   }
 
   getPositionMarker({ isCurrentPos = false, coordinates, label }) {
@@ -180,16 +227,14 @@ class OrbitPointsDrawer extends OrbitCommonClass {
 
     var newTime = null;
     var coordinates = null;
-    var currentCoordinates = null;
     var marker = null;
-    for (var i of [...Array(6).keys()]) {
+    var numPoints = this._showOnlyCurrent ? 1 : 6;
+    for (var i of [...Array(numPoints).keys()]) {
       newTime = MomentLibrary().add(i, "hours");
       coordinates = this._tle.getLatLon(
         this._twoLineElement,
         newTime.valueOf()
       );
-      console.debug(coordinates);
-      if (i === 0) currentCoordinates = coordinates;
       marker = this.getPositionMarker({
         isCurrentPos: i === 0,
         coordinates,
@@ -197,19 +242,12 @@ class OrbitPointsDrawer extends OrbitCommonClass {
       });
       this._orbitPoints.push(this._cesiumMapObject.entities.add(marker));
     }
-    // center on first marker
-    this._cesiumMapObject.camera.flyTo({
-      destination: CesiumLibrary.Cartesian3.fromDegrees(
-        currentCoordinates.lat,
-        currentCoordinates.lng,
-        15000 * 1000 // initial view at x km
-      )
-    });
   }
 }
 
-module.exports = exports = {
-  OrbitPointsDrawer,
+module.exports = {
+  GroundTrackPointsDrawer,
   OrbitPolylineDrawer,
-  GroundTrackPolylineDrawer
+  GroundTrackPolylineDrawer,
+  CurrentPositionDrawer
 };

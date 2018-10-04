@@ -8,17 +8,21 @@ const MiscStyling = require("./main.css");
 // import custom classes
 const CesiumClasses = require("./cesium-classes.js");
 const AdditionalClasses = require("./classes.js");
+const CesiumLibrary = require("cesium/Source/Cesium");
 
 // define global constants
-const cesiumWithCR = new CesiumClasses.CesiumWithCorrectedReflectance(
-  "cesiumContainer"
+const cesium = new CesiumClasses.Cesium("cesiumContainer");
+const cesiumViewer = cesium.cesiumViewer;
+const groundTrackPointsDrawer = new AdditionalClasses.GroundTrackPointsDrawer(
+  cesiumViewer
 );
-const cesiumViewer = cesiumWithCR.cesiumViewer;
-const orbitPointsDrawer = new AdditionalClasses.OrbitPointsDrawer(cesiumViewer);
 const groundTrackPolylineDrawer = new AdditionalClasses.GroundTrackPolylineDrawer(
   cesiumViewer
 );
 const orbitPolylineDrawer = new AdditionalClasses.OrbitPolylineDrawer(
+  cesiumViewer
+);
+const currentPositionDrawer = new AdditionalClasses.CurrentPositionDrawer(
   cesiumViewer
 );
 
@@ -32,9 +36,17 @@ window.addEventListener("message", ({ data }) => {
   fetchData(data)
     .then(data => {
       console.debug("TLE received:", data);
-      draw(data.data.spacecraft.latest_tle);
-
-      // cesiumViewer.zoomTo(cesiumViewer.entities);
+      const { spacecraft } = data.data;
+      const { center } = draw(spacecraft);
+      console.debug("current position", center);
+      const zSign = center.z < 0 ? -1 : 1;
+      cesiumViewer.camera.setView({
+        destination: CesiumLibrary.Cartesian3.fromElements(
+          center.x,
+          center.y,
+          zSign * 10 ** 7 // good height for LEOs
+        )
+      });
       cesiumViewer.scene.globe.enableLighting = true;
     })
     .catch(console.error);
@@ -54,8 +66,10 @@ function fetchData({
       Authorization: authToken
     },
     body: JSON.stringify({
-      query: `query getSpacecraft($spacecraftId: String!) {
+      query: `
+        query getSpacecraft($spacecraftId: String!) {
           spacecraft(id: $spacecraftId) {
+            orbit_category
             latest_tle {
               tle_line1
               tle_line2
@@ -67,27 +81,22 @@ function fetchData({
   }).then(r => r.json());
 }
 
-// main entry point of the application
-// fetch("stations.txt")
-//   .then(res => res.text())
-//   .then(function(text) {
-//     // this will split the TLE text file line by line
-//     twoLineElements = text.match(/[^\r\n]+/g);
-//   })
-//   .then(() => createListOfSatellites());
-
-/**
- * Draws orbit points and polyline given a TLE string
- * @param {string} _twoLineElement
- */
-function draw(_twoLineElement) {
-  _twoLineElement = [_twoLineElement.tle_line1, _twoLineElement.tle_line2];
-  orbitPointsDrawer.twoLineElement = _twoLineElement;
-  orbitPointsDrawer.draw();
-  orbitPolylineDrawer.twoLineElement = _twoLineElement;
+function draw(spacecraft) {
+  const tle = spacecraft.latest_tle;
+  const lines = [tle.tle_line1, tle.tle_line2];
+  const isGeo = /geo/i.test(spacecraft.orbit_category);
+  if (!isGeo) {
+    groundTrackPolylineDrawer.twoLineElement = lines;
+    groundTrackPolylineDrawer.draw();
+  }
+  groundTrackPointsDrawer.twoLineElement = lines;
+  groundTrackPointsDrawer.showOnlyCurrent = isGeo;
+  groundTrackPointsDrawer.draw();
+  orbitPolylineDrawer.twoLineElement = lines;
   orbitPolylineDrawer.draw();
-  groundTrackPolylineDrawer.twoLineElement = _twoLineElement;
-  groundTrackPolylineDrawer.draw();
+  currentPositionDrawer.twoLineElement = lines;
+  const center = currentPositionDrawer.draw();
+  return { center };
 }
 
 /**
