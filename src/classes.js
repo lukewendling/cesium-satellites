@@ -33,21 +33,21 @@ class OrbitPolylineDrawer extends OrbitCommonClass {
 
   // Draw satellite orbit
   _draw() {
-    var satelliteOrbit = [];
-    var newTime = null;
+    let satelliteOrbit = [];
+    let newTime = null;
     // ignores line 1 in 3 line variant.
-    var [tle1, tle2] = this.twoLineElement.slice(-2);
-    var satrec = satelliteLibrary.twoline2satrec(tle1, tle2);
-    var gmst = satelliteLibrary.gstime(new Date());
+    let [tle1, tle2] = this.twoLineElement.slice(-2);
+    let satrec = satelliteLibrary.twoline2satrec(tle1, tle2);
+    let gmst = satelliteLibrary.gstime(new Date());
 
-    for (var i of [...Array(100).keys()]) {
+    for (let i of [...Array(100).keys()]) {
       newTime = MomentLibrary().add(i * 10, "minutes");
-      var positionAndVelocity = satelliteLibrary.propagate(
+      let positionAndVelocity = satelliteLibrary.propagate(
         satrec,
         newTime.toDate()
       );
-      var positionEci = positionAndVelocity.position;
-      var positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst),
+      let positionEci = positionAndVelocity.position;
+      let positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst),
         satelliteOrbit = satelliteOrbit.concat([
           positionEcf.x * 1000,
           positionEcf.y * 1000,
@@ -80,17 +80,17 @@ class CurrentPositionDrawer extends OrbitCommonClass {
 
   // Draw current position
   _draw() {
-    var [tle1, tle2] = this.twoLineElement.slice(-2);
-    var satrec = satelliteLibrary.twoline2satrec(tle1, tle2);
-    var newTime = MomentLibrary();
-    var positionAndVelocity = satelliteLibrary.propagate(
+    let [tle1, tle2] = this.twoLineElement.slice(-2);
+    let satrec = satelliteLibrary.twoline2satrec(tle1, tle2);
+    let newTime = MomentLibrary();
+    let positionAndVelocity = satelliteLibrary.propagate(
       satrec,
       newTime.toDate()
     );
-    var gmst = satelliteLibrary.gstime(newTime.toDate());
-    var positionEci = positionAndVelocity.position;
-    var positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst);
-    var satellitePos = CesiumLibrary.Cartesian3.fromElements(
+    let gmst = satelliteLibrary.gstime(newTime.toDate());
+    let positionEci = positionAndVelocity.position;
+    let positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst);
+    let satellitePos = CesiumLibrary.Cartesian3.fromElements(
       positionEcf.x * 1000,
       positionEcf.y * 1000,
       positionEcf.z * 1000
@@ -119,10 +119,10 @@ class GroundTrackPolylineDrawer extends OrbitCommonClass {
 
   // Draw ground track lines with lat-lng coords
   _draw() {
-    var satelliteOrbit = [];
-    var newTime = null;
-    var coordinates = null;
-    for (var i of [...Array(50).keys()]) {
+    let satelliteOrbit = [];
+    let newTime = null;
+    let coordinates = null;
+    for (let i of [...Array(50).keys()]) {
       newTime = MomentLibrary().add(i * 10, "minutes");
       coordinates = this._tle.getLatLon(this.twoLineElement, newTime.valueOf());
       satelliteOrbit = satelliteOrbit.concat([
@@ -221,15 +221,15 @@ class GroundTrackPointsDrawer extends OrbitCommonClass {
   // Draw ground track points with lat-lng coords
   _draw() {
     if (this._orbitPoints.length != 0) {
-      for (var op of this._orbitPoints)
+      for (let op of this._orbitPoints)
         this._cesiumMapObject.entities.remove(op);
     }
 
-    var newTime = null;
-    var coordinates = null;
-    var marker = null;
-    var numPoints = this._showOnlyCurrent ? 1 : 6;
-    for (var i of [...Array(numPoints).keys()]) {
+    let newTime = null;
+    let coordinates = null;
+    let marker = null;
+    let numPoints = this._showOnlyCurrent ? 1 : 6;
+    for (let i of [...Array(numPoints).keys()]) {
       newTime = MomentLibrary().add(i, "hours");
       coordinates = this._tle.getLatLon(
         this._twoLineElement,
@@ -274,12 +274,12 @@ class GroundStationsDrawer extends OrbitCommonClass {
   // Draw ground station points with lat-lng coords
   _draw() {
     if (this._groundStationPoints.length != 0) {
-      for (var gsp of this._groundStationPoints)
+      for (let gsp of this._groundStationPoints)
         this._cesiumMapObject.entities.remove(gsp);
     }
 
     this.getGroundStations().forEach(gs => {
-      var marker = {
+      let marker = {
         name: `Air Force SCN Station ${gs.name}`,
         position: CesiumLibrary.Cartesian3.fromDegrees(gs.lng, gs.lat),
         billboard: {
