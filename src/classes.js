@@ -47,13 +47,13 @@ class OrbitPolylineDrawer extends OrbitCommonClass {
         newTime.toDate()
       );
       let positionEci = positionAndVelocity.position;
-      let positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst),
-        satelliteOrbit = satelliteOrbit.concat([
-          positionEcf.x * 1000,
-          positionEcf.y * 1000,
-          positionEcf.z * 1000
-          // 404.8 * 1000
-        ]);
+      let positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst);
+      satelliteOrbit = satelliteOrbit.concat([
+        positionEcf.x * 1000,
+        positionEcf.y * 1000,
+        positionEcf.z * 1000
+        // 404.8 * 1000
+      ]);
     }
     if (this._orbitPolyline)
       this._cesiumMapObject.entities.remove(this._orbitPolyline);
