@@ -20,8 +20,8 @@ class OrbitCommonClass {
     this._twoLineElement = twoLineElementString;
   }
 
-  draw() {
-    return this._draw();
+  draw({ label = "", options = {} }) {
+    return this._draw({ label, options });
   }
 }
 
@@ -32,7 +32,7 @@ class OrbitPolylineDrawer extends OrbitCommonClass {
   }
 
   // Draw satellite orbit
-  _draw() {
+  _draw({ label, options }) {
     let satelliteOrbit = [];
     let newTime = null;
     // ignores line 1 in 3 line variant.
@@ -55,17 +55,17 @@ class OrbitPolylineDrawer extends OrbitCommonClass {
         // 404.8 * 1000
       ]);
     }
-    if (this._orbitPolyline)
-      this._cesiumMapObject.entities.remove(this._orbitPolyline);
+    // if (this._orbitPolyline)
+    //   this._cesiumMapObject.entities.remove(this._orbitPolyline);
 
     this._orbitPolyline = this._cesiumMapObject.entities.add({
-      name: "Orbit Polyline",
+      name: label || "Orbit Path",
       polyline: {
         positions: CesiumLibrary.Cartesian3.unpackArray(satelliteOrbit),
         width: 8,
         followSurface: true,
         material: new CesiumLibrary.PolylineArrowMaterialProperty(
-          CesiumLibrary.Color.DARKVIOLET
+          CesiumLibrary.Color.fromCssColorString(options.orbit.color)
         )
       }
     });
@@ -79,7 +79,7 @@ class CurrentPositionDrawer extends OrbitCommonClass {
   }
 
   // Draw current position
-  _draw() {
+  _draw({ label, options }) {
     let [tle1, tle2] = this.twoLineElement.slice(-2);
     let satrec = satelliteLibrary.twoline2satrec(tle1, tle2);
     let newTime = MomentLibrary();
@@ -97,10 +97,11 @@ class CurrentPositionDrawer extends OrbitCommonClass {
       // 404.8 * 1000
     );
 
-    if (this._currentPos)
-      this._cesiumMapObject.entities.remove(this._currentPos);
+    // if (this._currentPos)
+    //   this._cesiumMapObject.entities.remove(this._currentPos);
 
     this._currentPos = this._cesiumMapObject.entities.add({
+      name: label,
       position: satellitePos,
       billboard: {
         image: "Assets/Icons/sat.png"
@@ -118,7 +119,7 @@ class GroundTrackPolylineDrawer extends OrbitCommonClass {
   }
 
   // Draw ground track lines with lat-lng coords
-  _draw() {
+  _draw({ label, options }) {
     let satelliteOrbit = [];
     let newTime = null;
     let coordinates = null;
@@ -131,10 +132,10 @@ class GroundTrackPolylineDrawer extends OrbitCommonClass {
         0
       ]);
     }
-    if (this._groundTrackPolyline)
-      this._cesiumMapObject.entities.remove(this._groundTrackPolyline);
+    // if (this._groundTrackPolyline)
+    //   this._cesiumMapObject.entities.remove(this._groundTrackPolyline);
     this._groundTrackPolyline = this._cesiumMapObject.entities.add({
-      name: "Ground Track Polyline",
+      name: label,
       polyline: {
         positions: CesiumLibrary.Cartesian3.fromDegreesArrayHeights(
           satelliteOrbit
@@ -219,11 +220,11 @@ class GroundTrackPointsDrawer extends OrbitCommonClass {
   }
 
   // Draw ground track points with lat-lng coords
-  _draw() {
-    if (this._orbitPoints.length != 0) {
-      for (let op of this._orbitPoints)
-        this._cesiumMapObject.entities.remove(op);
-    }
+  _draw({ label, options }) {
+    // if (this._orbitPoints.length != 0) {
+    //   for (let op of this._orbitPoints)
+    //     this._cesiumMapObject.entities.remove(op);
+    // }
 
     let newTime = null;
     let coordinates = null;
@@ -272,11 +273,11 @@ class GroundStationsDrawer extends OrbitCommonClass {
   }
 
   // Draw ground station points with lat-lng coords
-  _draw() {
-    if (this._groundStationPoints.length != 0) {
-      for (let gsp of this._groundStationPoints)
-        this._cesiumMapObject.entities.remove(gsp);
-    }
+  _draw({ label, options }) {
+    // if (this._groundStationPoints.length != 0) {
+    //   for (let gsp of this._groundStationPoints)
+    //     this._cesiumMapObject.entities.remove(gsp);
+    // }
 
     this.getGroundStations().forEach(gs => {
       let marker = {
