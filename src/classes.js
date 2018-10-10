@@ -105,6 +105,13 @@ class CurrentPositionDrawer extends OrbitCommonClass {
       position: satellitePos,
       billboard: {
         image: "Assets/Icons/sat.png"
+      },
+      label: {
+        text: label.toUpperCase(),
+        font: "10pt sans-serif",
+        fillColor: CesiumLibrary.Color.WHITE,
+        verticalOrigin: CesiumLibrary.VerticalOrigin.TOP,
+        pixelOffset: new CesiumLibrary.Cartesian2(0, 32)
       }
     });
 
