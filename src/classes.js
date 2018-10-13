@@ -262,7 +262,7 @@ class GroundTrackPointsDrawer extends OrbitCommonClass {
     let newTime = null;
     let coordinates = null;
     let marker = null;
-    let numPoints = this._showOnlyCurrent ? 1 : 6;
+    let numPoints = this._showOnlyCurrent ? 1 : options.hours || 6;
     for (let i of [...Array(numPoints).keys()]) {
       newTime = MomentLibrary().add(i, "hours");
       coordinates = this._tle.getLatLon(
@@ -272,7 +272,7 @@ class GroundTrackPointsDrawer extends OrbitCommonClass {
       marker = this.getPositionMarker({
         isCurrentPos: i === 0,
         coordinates,
-        label: newTime.fromNow()
+        label: i === 0 ? "now" : `+${i}h`
       });
       this._orbitPoints.push(this._cesiumMapObject.entities.add(marker));
     }
