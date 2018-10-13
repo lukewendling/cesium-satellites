@@ -29,32 +29,58 @@ class OrbitPolylineDrawer extends OrbitCommonClass {
   constructor(cesiumMapObject) {
     super(cesiumMapObject);
     this._orbitPolyline = null;
+    this._period = 0;
+  }
+
+  set period(mins) {
+    this._period = mins;
+  }
+
+  propagate({ satrec, gmst, time }) {
+    const positionAndVelocity = satelliteLibrary.propagate(satrec, time);
+    const positionEci = positionAndVelocity.position;
+    const positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst);
+    return [
+      positionEcf.x * 1000,
+      positionEcf.y * 1000,
+      positionEcf.z * 1000
+      // 404.8 * 1000
+    ];
   }
 
   // Draw satellite orbit
   _draw({ label, options }) {
     let satelliteOrbit = [];
-    let newTime = null;
     // ignores line 1 in 3 line variant.
     let [tle1, tle2] = this.twoLineElement.slice(-2);
     let satrec = satelliteLibrary.twoline2satrec(tle1, tle2);
     let gmst = satelliteLibrary.gstime(new Date());
+    // create points to connect with a polyline
+    let step = 10; // mins
+    let totalSteps = Math.ceil(this._period / step);
 
-    for (let i of [...Array(100).keys()]) {
-      newTime = MomentLibrary().add(i * 10, "minutes");
-      let positionAndVelocity = satelliteLibrary.propagate(
-        satrec,
-        newTime.toDate()
+    for (let i of [...Array(totalSteps).keys()]) {
+      satelliteOrbit.push(
+        ...this.propagate({
+          satrec,
+          gmst,
+          time: MomentLibrary()
+            .add(i * step, "minutes")
+            .toDate()
+        })
       );
-      let positionEci = positionAndVelocity.position;
-      let positionEcf = satelliteLibrary.eciToEcf(positionEci, gmst);
-      satelliteOrbit = satelliteOrbit.concat([
-        positionEcf.x * 1000,
-        positionEcf.y * 1000,
-        positionEcf.z * 1000
-        // 404.8 * 1000
-      ]);
     }
+    // complete the ellipse
+    satelliteOrbit.push(
+      ...this.propagate({
+        satrec,
+        gmst,
+        time: MomentLibrary()
+          .add(Math.floor(this.period), "minutes")
+          .toDate()
+      })
+    );
+
     // if (this._orbitPolyline)
     //   this._cesiumMapObject.entities.remove(this._orbitPolyline);
 

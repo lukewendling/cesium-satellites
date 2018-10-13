@@ -83,6 +83,7 @@ function buildQuery(spacecraftIds) {
           latest_tle {
             tle_line1
             tle_line2
+            period
           }
         }
       `,
@@ -107,6 +108,7 @@ function buildQuery(spacecraftIds) {
           latest_tle {
             tle_line1
             tle_line2
+            period
           }
         }
       `,
@@ -153,6 +155,7 @@ function draw(spacecraft, options = {}) {
   }
   if (options.orbit && options.orbit.on) {
     orbitPolylineDrawer.twoLineElement = lines;
+    orbitPolylineDrawer.period = tle.period;
     orbitPolylineDrawer.draw({ label: spacecraft.spacecraft_name, options });
   }
   if (options.current_position && options.current_position.on) {
